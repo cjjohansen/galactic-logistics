@@ -1,0 +1,9 @@
+# API Profile: Location Management API
+
+| Operation Name | Description | Participants | Resource(s) | Emitted Events | Operation Details | Traits |
+| -------------- | ----------- | ------------ | ----------- | -------------- | ----------------- | ------ |
+| **Create Location** | Allows the creation of a new location with details like name, coordinates, address, type, and verification status. | User | Location | LocationCreated | - **HTTP Method**: POST <br> - **Path**: /locations <br> - **Request Body**: Location data (name, latitude, longitude, address, locationType, verified) <br> - **Response**: Newly created location with ID and metadata. | Requires Authentication |
+| **Get Locations** | Retrieves a list of all available locations, with optional filters for type and verification status. | User | Location | None | - **HTTP Method**: GET <br> - **Path**: /locations <br> - **Query Parameters**: locationType, verified <br> - **Response**: List of locations with metadata. | Supports Pagination |
+| **Update Location** | Updates an existing location’s details, including address, type, and verification status. | User | Location | LocationUpdated | - **HTTP Method**: PUT <br> - **Path**: /locations/{id} <br> - **Request Body**: Updated location data <br> - **Response**: Updated location details | Requires Authentication |
+| **Delete Location** | Deletes a specific location by its ID. | User | Location | LocationDeleted | - **HTTP Method**: DELETE <br> - **Path**: /locations/{id} <br> - **Response**: Confirmation of deletion | Requires Authentication |
+| **Verify Location** | Marks a location as verified. | Admin | Location | LocationVerified | - **HTTP Method**: PATCH <br> - **Path**: /locations/{id}/verify <br> - **Response**: Updated location with verified status set to true | Admin Only |

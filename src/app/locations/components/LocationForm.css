@@ -1,0 +1,64 @@
+/* Container for the form content */
+.location-form {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(140, 140, 140, 0.8); /* Semi-transparent background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3); /* Slight shadow for elevated appearance */
+    max-width: 400px; /* Maximum width to prevent stretching */
+  }
+  
+  /* Label styling for form inputs */
+  .location-form label {
+    margin-bottom: 10px;
+    color: grey;
+    font-size: 14px;
+  }
+  
+  /* Input fields and select dropdown styling */
+  .location-form input,
+  .location-form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Light border for input fields */
+    background-color: #ccc;
+    margin-bottom: 15px;
+    font-size: 14px;
+    width: 100%; /* Make inputs full width */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+
+  }
+  
+  /* Styling for form action buttons (Add Location, Cancel) */
+  .form-actions {
+    display: flex;
+    justify-content: space-between; /* Place buttons side by side with space in between */
+    margin-top: 15px;
+  }
+  
+  /* Button styling for both Cancel and Add Location */
+  button {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none; /* Remove default border */
+  }
+  
+  /* Specific styling for the Cancel button */
+  .cancel-btn {
+    background-color: #888;
+    color: white;
+  }
+  
+  /* Hover effect for all buttons */
+  button:hover {
+    background-color: #666; /* Darker grey on hover */
+  }
+  
+  /* Error message styling */
+  .error {
+    color: red;
+    font-size: 12px;
+  }
+  

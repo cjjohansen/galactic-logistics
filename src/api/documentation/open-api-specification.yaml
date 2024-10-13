@@ -1,0 +1,378 @@
+openapi: 3.0.3
+info:
+  title: Combined API (Authentication, User Management, Locations)
+  description: A combined API handling OAuth2-based authentication, user management, and location management.
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: Authentication
+    description: OAuth2/OpenID Connect-based authentication capabilities.
+  - name: Users
+    description: User management including registration, updates, and account actions.
+  - name: Locations
+    description: Location management, supporting operations for creating, updating, and listing locations.
+
+paths:
+
+  ### Authentication Capability ###
+  
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Generate an OAuth2 token
+      operationId: generateToken
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  enum: [authorization_code, client_credentials, refresh_token]
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+                code:
+                  type: string
+                redirect_uri:
+                  type: string
+              required: [grant_type, client_id, client_secret]
+      responses:
+        '200':
+          description: Access token and refresh token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Revoke the current access token
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required: [token]
+      responses:
+        '200':
+          description: Successfully logged out
+
+  /auth/userinfo:
+    get:
+      tags:
+        - Authentication
+      summary: Get the authenticated user's info (OpenID Connect)
+      operationId: getUserInfo
+      security:
+        - oauth2:
+            - openid
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sub:
+                    type: string
+                    description: Unique identifier for the user
+                  name:
+                    type: string
+                  email:
+                    type: string
+
+  ### User Management Capability ###
+
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /users/{id}/email:
+    patch:
+      tags:
+        - Users
+      summary: Change user email
+      operationId: changeEmail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required: [email]
+      responses:
+        '200':
+          description: User email updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /users/{id}/password:
+    patch:
+      tags:
+        - Users
+      summary: Change user password
+      operationId: changePassword
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+              required: [current_password, new_password]
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /users/{id}/address:
+    patch:
+      tags:
+        - Users
+      summary: Change user address
+      operationId: changeAddress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: Address updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  ### Location Management Capability ###
+
+  /locations:
+    post:
+      tags:
+        - Locations
+      summary: Create a new location
+      operationId: createLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '201':
+          description: Location created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationResponse'
+
+    get:
+      tags:
+        - Locations
+      summary: Retrieve all locations
+      operationId: getLocations
+      responses:
+        '200':
+          description: A list of locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationResponse'
+
+  /locations/{id}:
+    put:
+      tags:
+        - Locations
+      summary: Update a location
+      operationId: updateLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '200':
+          description: Location updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationResponse'
+
+    delete:
+      tags:
+        - Locations
+      summary: Delete a location
+      operationId: deleteLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Location deleted successfully
+
+components:
+  schemas:
+    NewUser:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - email
+        - password
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    Location:
+      type: object
+      properties:
+        name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        locationType:
+          type: string
+          enum:
+            - Warehouse
+            - Terminal
+            - FreightLocation
+        verified:
+          type: boolean
+        address:
+          $ref: '#/components/schemas/Address'
+
+    LocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Location'
+        - type: object
+          properties:
+            id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            openid: Access to OpenID Connect
